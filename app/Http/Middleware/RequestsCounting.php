@@ -22,9 +22,17 @@ class RequestsCounting
     {
         $diffTime = Carbon::now()->timestamp - session('timestamp_first');
 
+        if ($diffTime > $period && session('attempt') > $requestCount) {
+            session()->forget(['timestamp_first', 'attempt']);
+        }
+
         if (!session()->has('timestamp_first')) {
             session()->put('timestamp_first', Carbon::now()->timestamp);
         }
+
+
+        session()->increment('attempt');
+        dump(session()->all());
 
         if (
             session('attempt') > $requestCount
@@ -32,11 +40,6 @@ class RequestsCounting
         ) {
             $time = $period - $diffTime;
             abort(429, "Too many requests. Wait: {$time}");
-        } else {
-            if ($diffTime > $period && session('attempt') > $requestCount) {
-                session()->forget(['timestamp_first', 'attempt']);
-            }
-            session()->increment('attempt');
         }
 
         return $next($request);

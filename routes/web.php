@@ -15,8 +15,16 @@ use Illuminate\Support\Facades\Route;
 
 Route::get('/', function () {
     return view('welcome');
-})->middleware('request_counter:5,20');
+})->middleware('request_counter_ip:5,5');
+
+Route::get('/test', function () {
+    return view('welcome');
+})->middleware('request_counter_ip:2,10');
 
 Route::get('/home', function () {
     return 'Test';
 })->middleware('request_counter:3,5');
+
+Route::get('/home2', function () {
+    return 'Test';
+})->middleware('request_counter:5,10');
